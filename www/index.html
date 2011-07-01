@@ -11,7 +11,42 @@
         <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
         <script type="text/javascript" src="phonegap.0.9.6.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.0b1.min.js"></script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript">
+            $('#park')
+                .live('pageshow', function(){
+					var $content = $('#park').find('div[data-role="content"]');
+					$.mobile.showPageLoadingMsg();
+					console.log("on page show");
+					$.ajax({
+						url: "http://clien.career.co.kr/cs2/bbs/board.php?bo_table=park"
+					}).success(function(response){
+						$.mobile.hidePageLoadingMsg();
+						//console.log(response);
+						var $tr = $(response).find('div.board_main tr');
+						console.log($tr.length,'post found');
+						$tr.each(function(index){
+                            if(index<2){ return; } // skip notice post
+							console.log('#'+index);
+							var $post = $(this);
+							var post_id = $post.find('td').eq(0).text();
+                            console.log('post_id='+post_id);
+							var $post_subject = $post.find('td.post_subject');
+                            if( $post_subject.find('a').length ){
+								console.log('subject='+$post_subject.find('a').text());
+								
+							}else{
+								console.warn('blocked post');
+								return;
+							}     
+                            // #comment on span
+                            // blocked post has no anchor
+							//console.log($td);
+							//$content.append($td);
+						});
+					});
+                });
+			//
+		</script>
     </head>
     <body>
         <div data-role="page" id="home">
@@ -22,6 +57,7 @@
 
             <div data-role="content">
                 <ul data-role="listview" data-inset="true">
+                    <li><a href="#park">모두의 공원</a></li>
                     <li data-role="list-divider">PhoneGap</li>
                     <li><a href="accelerometer.html">Accelerometer</a></li>
                     <li><a href="camera.html">Camera</a></li>
@@ -32,6 +68,17 @@
                     <li data-role="list-divider">HTML 5</li>
                     <li><a href="geolocation.html">Geolocation</a></li>
                 </ul>
+            </div>
+
+        </div>
+
+        <div data-role="page" id="park">
+
+            <div data-role="header">
+                <h1>모두의 공원</h1>
+            </div>
+
+            <div data-role="content">
             </div>
 
         </div>
