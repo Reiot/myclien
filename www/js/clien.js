@@ -15,8 +15,11 @@ function removeTag(html, tag){
     return html.replace(re,'');
 }
 function removeImgSrc(html){
-    return html.replace(/<img([^>]*)\ssrc=['"][^'"]+['"]/gi,
-        '<img$1 data-src=""');    
+    // return html.replace(/<img([^>]*)\ssrc=['"][^'"]+['"]/gi,
+    //         '<img$1 data-src=""');    
+    
+    return html.replace(/<img([^>]*)\ssrc=/gi,
+        '<img$1 data-src=');    
 }
 
 // Comment
