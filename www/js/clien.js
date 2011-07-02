@@ -1,8 +1,22 @@
 /*jslint devel:true, evil:true, forin:true, type:true */
-/*global console:false, window:false, jQuery:false, Backbone:false */
+/*global console:false, window:false, jQuery:false, $:false, Backbone:false */
 
 if (!window.console) {
     window.console = {log: function() {}}; 
+}
+
+//text = text.replace(/\<iframe(.+?)\<\/iframe\>/i, "");
+function findTag(html, tag){    
+    var re = new RegExp('<'+tag + '(.+?)' + '</'+tag+'>', 'g');    
+    console.log( html.match(re));
+}
+function removeTag(html, tag){    
+    var re = new RegExp('<'+tag + '(.+?)' + '</'+tag+'>', 'g');    
+    return html.replace(re,'');
+}
+function removeImgSrc(html){
+    return html.replace(/<img([^>]*)\ssrc=['"][^'"]+['"]/gi,
+        '<img$1 data-src=""');    
 }
 
 // Comment
@@ -27,8 +41,37 @@ var Posts = Backbone.Collection.extend({
     model: Post,
     parse: function(response){
         var posts = [];
+        //findTag(response,'iframe');
+        //findTag(response,'script');
+        response = removeTag(response,'iframe');
+        response = removeTag(response,'script');
+        //findTag(response,'iframe');
+        //findTag(response,'script');
+        response = removeImgSrc(response);
+        
+        //response = removeIFrame(response);
         var $response = $(response);
-                var $tr = $response.find('div.board_main tr');
+        $response
+            //.find('iframe, script').remove().end()
+            .find('#header').remove().end()
+            .find('#aside').remove().end()
+            .find('img').attr('src','');
+        // $('img', response).each(function(){
+        //     var $img = $(this);
+        //     var src = $img.attr('src');
+        //     var newSrc;
+        //     if(src[0]==="/"){
+        //         newSrc = 'http://clien.career.co.kr' + src;
+        //     }else if(src.length>2 && src[0]==="." && src[1]==="."){
+        //         newSrc = 'http://clien.career.co.kr/cs2' + src.slice(2);
+        //     }else{
+        //         console.warn(src);
+        //     }
+        //     console.log('img.src', src, newSrc);
+        //     $img.attr('src', newSrc);
+        // });
+        
+        var $tr = $response.find('div.board_main tr');
         //console.log($tr.length,'post found');
         $tr.each(function(index){
             if(index<2){ return; } // skip notice post
@@ -49,6 +92,7 @@ var Posts = Backbone.Collection.extend({
                 id: post_id,
                 subject: post_subject 
             });
+            //$('body').append($response);
         });
         return posts;
     }
@@ -61,6 +105,23 @@ var Board = Backbone.Model.extend({
     initialize: function(){
         this.posts = new Posts();
         this.posts.url = this.url();
+    },
+    fetch: function(){
+        var self = this;
+        return self.posts.fetch({
+                error: function(err){
+                    console.error('something wrong',err);
+                },
+                dataType:'html'
+            })
+            .success(function(){
+                self.posts.each(function(post){
+                    console.log(post.id, post.get('subject'));
+                });
+            })
+            .error(function(a,b,c){
+                console.error(a,b,c);
+            });
     }
 });
 
@@ -76,7 +137,7 @@ var boards = new Boards([
 
 var park = boards.get("park");        
 console.log(park.url(), park.posts.url);
-park.posts.fetch({dataType:'html'})
+park.fetch()
     .success(function(){
         park.posts.each(function(post){
             console.log(post.id, post.get('subject'));
