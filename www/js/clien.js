@@ -1,5 +1,5 @@
 /*jslint devel:true, evil:true, forin:true, type:true */
-/*global console:false, window:false, jQuery:false, $:false, Backbone:false */
+/*global console:false, window:false, jQuery:false, $:false, _:false, Backbone:false */
 
 if (!window.console) {
     window.console = {log: function() {}}; 
@@ -40,7 +40,7 @@ var Post = Backbone.Model.extend({
     }
 });
 
-var Posts = Backbone.Collection.extend({ 
+var PostList = Backbone.Collection.extend({ 
     model: Post,
     parse: function(response){
         var posts = [];
@@ -52,27 +52,7 @@ var Posts = Backbone.Collection.extend({
         //findTag(response,'script');
         response = removeImgSrc(response);
         
-        //response = removeIFrame(response);
         var $response = $(response);
-        $response
-            //.find('iframe, script').remove().end()
-            .find('#header').remove().end()
-            .find('#aside').remove().end()
-            .find('img').attr('src','');
-        // $('img', response).each(function(){
-        //     var $img = $(this);
-        //     var src = $img.attr('src');
-        //     var newSrc;
-        //     if(src[0]==="/"){
-        //         newSrc = 'http://clien.career.co.kr' + src;
-        //     }else if(src.length>2 && src[0]==="." && src[1]==="."){
-        //         newSrc = 'http://clien.career.co.kr/cs2' + src.slice(2);
-        //     }else{
-        //         console.warn(src);
-        //     }
-        //     console.log('img.src', src, newSrc);
-        //     $img.attr('src', newSrc);
-        // });
         
         var $tr = $response.find('div.board_main tr');
         //console.log($tr.length,'post found');
@@ -106,7 +86,7 @@ var Board = Backbone.Model.extend({
         return 'http://clien.career.co.kr/cs2/bbs/board.php?bo_table=' + this.id;
     },    
     initialize: function(){
-        this.posts = new Posts();
+        this.posts = new PostList();
         this.posts.url = this.url();
     },
     fetch: function(){
@@ -133,28 +113,39 @@ var Boards = Backbone.Collection.extend({
     model: Board
 });
 
+(function($, window){
+
 var boards = new Boards([
    {id:'park', title: '모두의 공원'},
    {id:'cm_iphonien', title: '아이포니앙'}
 ]);
 
+var $boardList = $('#home div.content ul[data-role="listview"]');
+boards.each(function(board){
+    console.log(board.toJSON());
+    var $tmpl = $('#board-list-tmpl').tmpl(board.toJSON());
+    console.log($tmpl);
+    //$tmpl.appendTo($boardList);
+});
+
 var park = boards.get("park");        
 console.log(park.url(), park.posts.url);
 park.fetch()
     .success(function(){
+        var $postList = $('#board div.content ul[data-role="listview"]');
         park.posts.each(function(post){
             console.log(post.id, post.get('subject'));
+            $('#post-list-tmpl').tmpl(post.toJSON())
+                .appendTo($postList);
         });
     });
-
-(function($, window){
-
-$('#park')
-    .live('pageshow', function(){
-		$.mobile.showPageLoadingMsg();
-
-        var board = boards.get("park");        
-		console.log("#old posts=" + board.length);
-    });
+    
+// $('#park')
+//     .live('pageshow', function(){
+//      $.mobile.showPageLoadingMsg();
+// 
+//         var board = boards.get("park");        
+//      console.log("#old posts=" + board.length);
+//     });
 
 }(jQuery,window));

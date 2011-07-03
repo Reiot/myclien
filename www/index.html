@@ -13,7 +13,15 @@
         <script type="text/javascript" src="js/jquery.mobile-1.0b1.min.js"></script>
 	    <script type="text/javascript" src="js/underscore.js"></script>
 	    <script type="text/javascript" src="js/backbone.js"></script>
-	    <script type="text/javascript" src="js/clien.js"></script>
+	    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+		<script type="text/javascript" src="js/clien.js"></script>	    
+		<script id="board-list-tmpl" type="text/x-jquery-tmpl">
+			<li><a href="#board" data-board-id="${id}">${title}</a></li>
+		</script>
+		<script id="post-list-tmpl" type="text/x-jquery-tmpl">
+			<li><a href="#post" data-post-id="${id}">${title}</a></li>
+		</script>
+		
     </head>
     <body>
         <div data-role="page" id="home">
@@ -24,15 +32,12 @@
 
             <div data-role="content">
                 <ul data-role="listview">
-                    <li><a href="#park">모두의 공원</a></li>
-                    <li data-role="list-divider">소모임</li>
-                    <li><a href="#iphone">아이포니앙</a></li>
                 </ul>
             </div>
 
         </div>
 
-        <div data-role="page" id="park">
+        <div data-role="page" id="board">
             <div data-role="header">
                 <h1>모두의 공원</h1>
             </div>
@@ -41,5 +46,16 @@
                 </ul>
             </div>
         </div>
+
+        <div data-role="page" id="post">
+            <div data-role="header">
+                <h1>모두의 공원</h1>
+            </div>
+            <div data-role="content">
+                <ul data-role="listview">
+                </ul>
+            </div>
+        </div>
+
     </body>
 </html>

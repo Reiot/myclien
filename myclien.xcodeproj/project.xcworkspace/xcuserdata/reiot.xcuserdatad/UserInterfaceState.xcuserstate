@@ -299,7 +299,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>23</integer>
+					<integer>122</integer>
 				</dict>
 			</array>
 		</dict>
@@ -1236,8 +1236,8 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>331305722.24347198</real>
-		<string>{0, 1463}</string>
+		<real>331314069.77664602</real>
+		<string>{0, 1483}</string>
 		<false/>
 		<string>{0, 0}</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
@@ -1282,7 +1282,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>{{0, 0}, {1140, 583}}</string>
+		<string>{{0, 0}, {1140, 876}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -6540,11 +6540,11 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>692</integer>
+					<integer>693</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>693</integer>
+					<integer>694</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -7939,8 +7939,8 @@
 				</dict>
 			</array>
 		</dict>
-		<real>331305722.24262798</real>
-		<string>{0, 1463}</string>
+		<real>331314069.77567703</real>
+		<string>{0, 1483}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8336,7 +8336,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>672</integer>
+					<integer>692</integer>
 				</dict>
 			</array>
 		</dict>
@@ -8600,7 +8600,7 @@
 				<integer>689</integer>
 			</dict>
 			<key>NS.time</key>
-			<real>331305717.24204302</real>
+			<real>331314059.09235001</real>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -8611,8 +8611,9 @@
 			<key>$classname</key>
 			<string>NSDate</string>
 		</dict>
-		<string>Today at 오후 10:21</string>
+		<string>Today at 오전 12:40</string>
 		<integer>106</integer>
+		<string>myclien</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8637,11 +8638,7 @@
 			<array>
 				<dict>
 					<key>CF$UID</key>
-					<integer>694</integer>
-				</dict>
-				<dict>
-					<key>CF$UID</key>
-					<integer>696</integer>
+					<integer>695</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -8653,19 +8650,23 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>700</integer>
+					<integer>699</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>702</integer>
+					<integer>701</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>704</integer>
+					<integer>703</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>706</integer>
+					<integer>705</integer>
+				</dict>
+				<dict>
+					<key>CF$UID</key>
+					<integer>707</integer>
 				</dict>
 			</array>
 		</dict>
@@ -8683,7 +8684,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>695</integer>
+				<integer>696</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/www/index.html</string>
@@ -8735,7 +8736,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>699</integer>
+				<integer>700</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/myclien.xcodeproj/project.pbxproj</string>
@@ -8753,7 +8754,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>701</integer>
+				<integer>702</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/www/js/jquery.mobile-1.0b1.js</string>
@@ -8771,7 +8772,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>703</integer>
+				<integer>704</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/www/js/jquery.mobile-1.0b1.min.js</string>
@@ -8789,7 +8790,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>705</integer>
+				<integer>706</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/www/js/jquery.mobile.1.0a4.1.js</string>
@@ -8807,7 +8808,7 @@
 			<key>NS.relative</key>
 			<dict>
 				<key>CF$UID</key>
-				<integer>707</integer>
+				<integer>708</integer>
 			</dict>
 		</dict>
 		<string>file://localhost/Users/reiot/Documents/Works/myclien/www/config.xml</string>
