@@ -87,6 +87,7 @@ var Board = Backbone.Model.extend({
     },    
     initialize: function(){
         this.posts = new PostList();
+        this.posts.board = this;
         this.posts.url = this.url();
     },
     fetch: function(){
@@ -98,9 +99,9 @@ var Board = Backbone.Model.extend({
                 dataType:'html'
             })
             .success(function(){
-                self.posts.each(function(post){
-                    console.log(post.id, post.get('subject'));
-                });
+                // self.posts.each(function(post){
+                //     console.log(post.id, post.get('subject'));
+                // });
             })
             .error(function(a,b,c){
                 console.error(a,b,c);
@@ -113,6 +114,8 @@ var Boards = Backbone.Collection.extend({
     model: Board
 });
 
+// TODO
+// create page per post as "#board.id-post.id" before transition
 (function($, window){
 
 var boards = new Boards([
@@ -120,32 +123,76 @@ var boards = new Boards([
    {id:'cm_iphonien', title: '아이포니앙'}
 ]);
 
-var $boardList = $('#home div.content ul[data-role="listview"]');
+var $boardList = $('#home ul.boards');
 boards.each(function(board){
-    console.log(board.toJSON());
-    var $tmpl = $('#board-list-tmpl').tmpl(board.toJSON());
+    console.log('toJSON',board.toJSON());
+    var $tmpl = $('#board-list-tmpl').tmpl(board);
     console.log($tmpl);
-    //$tmpl.appendTo($boardList);
+    $tmpl.appendTo($boardList);
+    
+    var $pageTmpl = $('#board-page-tmpl').tmpl(board.toJSON());
+    console.log($pageTmpl);
+    $pageTmpl.appendTo('body');
 });
 
-var park = boards.get("park");        
-console.log(park.url(), park.posts.url);
-park.fetch()
-    .success(function(){
-        var $postList = $('#board div.content ul[data-role="listview"]');
-        park.posts.each(function(post){
-            console.log(post.id, post.get('subject'));
-            $('#post-list-tmpl').tmpl(post.toJSON())
-                .appendTo($postList);
-        });
-    });
+$('div.board').live('pageshow', function(event, ui){
+    console.log('board.pageshow');
+
+    $.mobile.showPageLoadingMsg();
     
-// $('#park')
-//     .live('pageshow', function(){
-//      $.mobile.showPageLoadingMsg();
-// 
-//         var board = boards.get("park");        
-//      console.log("#old posts=" + board.length);
-//     });
+    var $page = $(this);
+    var $postList = $page.find('ul.posts');
+    var board = boards.get( $page.attr('id') );        
+    console.log(board.url(), board.posts.url);
+    board.fetch()
+        .success(function(){
+            board.posts.each(function(post){
+                console.log(board.id, post.id, post.get('subject'));
+                $('#post-list-tmpl').tmpl({
+                    board: board,
+                    post: post
+                })
+                .appendTo($postList);
+            });
+            $postList.listview('refresh');
+        })
+        .complete(function(){
+            $.mobile.hidePageLoadingMsg();
+        });
+});
+    
+$('div.board ul.posts li a').live('tap', function(event, ui){
+    console.log('before show post');
+    // create empty post page if not exist
+    var $anchor = $(this);
+    var postID = $anchor.data('postID');
+    var boardID = $anchor.data('boardID');
+    console.log('board', boardID, 'post', postID, $anchor.attr('href'));
+    
+    // if($( $anchor.attr('href') ).length === 0){
+    //     var $pageTmpl = $('#post-page-tmpl').tmpl({
+    //         board: { id: boardID },
+    //         post: { id: postID }
+    //     });
+    //     console.log($pageTmpl);
+    //     $pageTmpl.appendTo('body').page();
+    // }
+});
+
+$('div.post').live('pageshow', function(event, ui){
+    console.log('post.pageshow');
+
+    // $.mobile.showPageLoadingMsg();
+    // 
+    // var $page = $(this);
+    // var board = boards.get( $page.attr('id') );        
+    // console.log(board.url(), board.posts.url);
+    // post.fetch()
+    //     .success(function(){
+    //     })
+    //     .complete(function(){
+    //         $.mobile.hidePageLoadingMsg();
+    //     });    
+});
 
 }(jQuery,window));

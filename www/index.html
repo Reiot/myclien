@@ -8,18 +8,37 @@
 
         <link rel="stylesheet" href="style/jquery.mobile-1.0b1.min.css" />
 
-        <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.6.1.js"></script>
         <script type="text/javascript" src="js/phonegap.0.9.6.js"></script>
-        <script type="text/javascript" src="js/jquery.mobile-1.0b1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.0b1.js"></script>
 	    <script type="text/javascript" src="js/underscore.js"></script>
 	    <script type="text/javascript" src="js/backbone.js"></script>
-	    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
-		<script type="text/javascript" src="js/clien.js"></script>	    
+	    <script type="text/javascript" src="js/jquery.tmpl.js"></script>
+
 		<script id="board-list-tmpl" type="text/x-jquery-tmpl">
-			<li><a href="#board" data-board-id="${id}">${title}</a></li>
+			<li><a href="#${id}" data-board-id="${id}">${attributes.title}</a></li>
+		</script>
+		<script id="board-page-tmpl" type="text/x-jquery-tmpl">
+			<div id="${id}" class="board" data-role="page">
+	            <div data-role="header">
+	                <h1>${title}</h1>
+	            </div>
+	            <div data-role="content">
+	                <ul class="posts" data-role="listview">
+	                </ul>
+	            </div>
+	        </div>
 		</script>
 		<script id="post-list-tmpl" type="text/x-jquery-tmpl">
-			<li><a href="#post" data-post-id="${id}">${title}</a></li>
+			<li><a href="#${board.id}-${post.id}" data-post-id="${post.id}" data-board-id="${board.id}">${post.attributes.subject}</a></li>
+		</script>
+		<script id="post-page-tmpl" type="text/x-jquery-tmpl">
+			<div id="${board.id}-${post.id}" class="post" data-role="page" data-url="${board.id}-${post.id}">
+	            <div data-role="header">
+	            </div>
+	            <div data-role="content">
+	            </div>
+	        </div>
 		</script>
 		
     </head>
@@ -31,31 +50,12 @@
             </div>
 
             <div data-role="content">
-                <ul data-role="listview">
+                <ul class="boards" data-role="listview">
                 </ul>
             </div>
 
         </div>
 
-        <div data-role="page" id="board">
-            <div data-role="header">
-                <h1>모두의 공원</h1>
-            </div>
-            <div data-role="content">
-                <ul data-role="listview">
-                </ul>
-            </div>
-        </div>
-
-        <div data-role="page" id="post">
-            <div data-role="header">
-                <h1>모두의 공원</h1>
-            </div>
-            <div data-role="content">
-                <ul data-role="listview">
-                </ul>
-            </div>
-        </div>
-
+		<script type="text/javascript" src="js/clien.js"></script>	    
     </body>
 </html>
