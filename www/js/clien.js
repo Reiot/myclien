@@ -118,6 +118,8 @@ var Boards = Backbone.Collection.extend({
 // create page per post as "#board.id-post.id" before transition
 (function($, window){
 
+$.mobile.ajaxEnabled = false;
+
 var boards = new Boards([
    {id:'park', title: '모두의 공원'},
    {id:'cm_iphonien', title: '아이포니앙'}
@@ -161,6 +163,7 @@ $('div.board').live('pageshow', function(event, ui){
         });
 });
     
+// FIXME called after a.click()
 $('div.board ul.posts li a').live('tap', function(event, ui){
     console.log('before show post');
     // create empty post page if not exist
@@ -169,14 +172,14 @@ $('div.board ul.posts li a').live('tap', function(event, ui){
     var boardID = $anchor.data('boardID');
     console.log('board', boardID, 'post', postID, $anchor.attr('href'));
     
-    // if($( $anchor.attr('href') ).length === 0){
-    //     var $pageTmpl = $('#post-page-tmpl').tmpl({
-    //         board: { id: boardID },
-    //         post: { id: postID }
-    //     });
-    //     console.log($pageTmpl);
-    //     $pageTmpl.appendTo('body').page();
-    // }
+    if($( $anchor.attr('href') ).length === 0){
+        var $pageTmpl = $('#post-page-tmpl').tmpl({
+            board: { id: boardID },
+            post: { id: postID }
+        });
+        console.log($pageTmpl);
+        $pageTmpl.appendTo('body').page();
+    }
 });
 
 $('div.post').live('pageshow', function(event, ui){
