@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
     xmlns:gap = "http://phonegap.com/ns/1.0"
-    id        = "com.phonegap.kitchensink"
+    id        = "com.reiot.clien"
     version   = "0.1.0">
 
-    <name>Kitchen Sink</name>
+    <name>MyClien</name>
 
     <description>
-        PhoneGap Kitchen Sink Demo
+        Mobile Client Viewer
     </description>
 
-    <author href="http://michaelbrooks.ca" email="michael.brooks@nitobi.com">
-        Michael Brooks
+    <author href="http://reiot.com" email="reiot94@gmail.com">
+        Ray Yun
     </author>
 
     <gap:platforms>

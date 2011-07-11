@@ -33,7 +33,12 @@
 			<li><a href="#${board.id}-${post.id}" data-post-id="${post.id}" data-board-id="${board.id}">${post.attributes.subject}</a></li>
 		</script>
 		<script id="post-page-tmpl" type="text/x-jquery-tmpl">
-			<div id="${board.id}-${post.id}" class="post" data-role="page" data-url="${board.id}-${post.id}">
+			<div id="${board.id}-${post.id}" 
+				class="post" 
+				data-role="page" 
+				data-url="${board.id}-${post.id}" 
+				data-board-id="${board.id}" 
+				data-post-id="${post.id}">
 	            <div data-role="header">
 	            </div>
 	            <div data-role="content">
