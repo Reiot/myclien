@@ -26,7 +26,7 @@ function parseAuthorImg(tag){
     var $img = tag.find("img");
     var author;
     if($img.length){
-        author = $img.attr('src');
+        author = $img.data('src');
         author = "http://clien.career.co.kr/cs2" + author.replace("..","");
     }else{
         author = tag.find("span");
@@ -64,8 +64,8 @@ function parseComment(tag){
     console.log(info_li);
     var info = info_li.replace(/()/g,"");
     
-    var div_content = tag.nextSibling('div');
-    var content = div_content.text().strip();
+    var div_content = tag.next('div');
+    var content = div_content.text();
     console.log('content', content);
     
     return {
@@ -134,7 +134,7 @@ var Post = Backbone.Model.extend({
         var info = $viewHead.find("p.post_info").text();
         console.log("info",info);
         
-        var title = $response.find('div.view_title div h4 span');
+        var title = $response.find('div.view_title div h4 span').text();
         console.log('title', title);
 
         var content = parseContent($response.find('div.resContents'));
@@ -330,7 +330,7 @@ $('div.post').live('pageshow', function(event, ui){
 
     console.log('post url',post.url());
     
-    post.fetch()
+    post.fetch({dataType:'html'})
         .success(function(){
         })
         .complete(function(){
