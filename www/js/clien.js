@@ -5,16 +5,11 @@ if (!window.console) {
     window.console = {log: function() {}}; 
 }
 
-//text = text.replace(/\<iframe(.+?)\<\/iframe\>/i, "");
-function findTag(html, tag){    
-    var re = new RegExp('<'+tag + '(.+?)' + '</'+tag+'>', 'g');    
-    console.log( html.match(re));
-}
 function removeTag(html, tag){    
-    var re = new RegExp('<'+tag + '(.+?)' + '</'+tag+'>', 'g');    
+    var re = new RegExp('<'+tag + '.+?' + '</'+tag+'>', 'gi');    
     return html.replace(re,'');
 }
-function removeImgSrc(html){
+function replaceImgSrc(html){
     // return html.replace(/<img([^>]*)\ssrc=['"][^'"]+['"]/gi,
     //         '<img$1 data-src=""');    
     
@@ -22,87 +17,7 @@ function removeImgSrc(html){
         '<img$1 data-src=');    
 }
 
-function parseAuthorImg(tag){
-    var $img = tag.find("img");
-    var author;
-    if($img.length){
-        author = $img.data('src');
-        author = "http://clien.career.co.kr/cs2" + author.replace("..","");
-    }else{
-        author = tag.find("span");
-    }
-    return author;
-}
 
-function parsePostID(anchor){
-    return (/wr_id=(\d+)/).match(anchor['href'])[1];
-}
-
-function parsePostInfo(tag){
-    var postID = parsePostID(tag.find("a"));
-    console.log('id',postID);
-
-    var title = tag.find("a");
-    console.log('title',title);
-
-    var commentCount = tag.find("span").text();
-    commentCount = commentCount.replace(/\[\]/g,'');
-    console.log('comments', commentCount);
-
-    return {
-        id: postID,
-        title: title,
-        commentCount: commentCount
-    };
-}
-    
-function parseComment(tag){
-    var author = parseAuthorImg(tag.find("ul li"));
-    console.log('author', author);
-    
-    var info_li = tag.find("ul li").eq(1).text();
-    console.log(info_li);
-    var info = info_li.replace(/()/g,"");
-    
-    var div_content = tag.next('div');
-    var content = div_content.text();
-    console.log('content', content);
-    
-    return {
-      author: author,
-      info: info,
-      content: content
-    };
-}
-
-function parseContent(tag, removeComment){
-
-    // tag.find("img").each(function(){
-    //     
-    //     if img['src'].startswith(".."):
-    //         img['src'] = "http://clien.career.co.kr/cs2" + img['src'].replace("..","")
-    //     elif img['src'].startswith("/cs2"):
-    //         img['src'] = "http://clien.career.co.kr" + img['src']
-    //     del img['onclick']
-    //     del img['style']
-    //     
-    // });
-
-    tag.find('script, form, textarea, input, div.ccl').remove();
-
-    if (removeComment){
-        tag.find('div.reply_head, div.reply_content').remove();
-    }
-        
-    var $sigDiv = tag.find('div.signature');
-    var sig;
-    if ($sigDiv.length){
-        sig = $sigDiv.find("dl dd").text();
-        $sigDiv.remove();
-    }
-
-    return [tag.html(), sig];
-}
 
 // Comment
 var Comment = Backbone.Model.extend({ 
@@ -121,27 +36,40 @@ var Post = Backbone.Model.extend({
         this.comments = new Comments(this.attributes.comments);
     },
     parse: function(response){
+        var self = this;
+        
         response = removeTag(response,'iframe');
         response = removeTag(response,'script');
-        response = removeImgSrc(response);
+        response = replaceImgSrc(response);
         
         var $response = $(response);
         
         var $viewHead = $response.find('div.view_head');
-        var author = parseAuthorImg($viewHead.find("p.user_info"));
+        var author = self.parseUserInfo( $viewHead.find("p.user_info") );
         console.log("author", author);
 
-        var info = $viewHead.find("p.post_info").text();
-        console.log("info",info);
+        var info = $viewHead.find("p.post_info").text().trim();
+        var match = /(\d\d\d\d-\d\d-\d\d \d\d:\d\d)\s+,\s+Hit\s:\s(\d+)\s+,\s+Vote\s+:\s+(\d+)/.exec(info);    
+        var date, hit = 0, vote = 0;
+        if(match){
+            date = match[1];
+            hit = match[2];
+            vote = match[3];
+        }
+        console.log(date,hit,vote);
         
-        var title = $response.find('div.view_title div h4 span').text();
-        console.log('title', title);
+        var subject = $response.find('div.view_title div h4 span').text().trim();
+        console.log('subject', subject);
 
-        var content = parseContent($response.find('div.resContents'));
+        var $content = $response.find('div.resContents span');
+        console.log('post.content', $content.html());
+
+        var signature = $response.find('div.signature dl dd').text().trim();
+        console.log('post.signature', signature);
         
         var comments = [];
         $response.find('div.reply_head').each(function(){
-            comments.push(parseComment($(this)));
+            comments.push( self.parseComment($(this)) );
         });
 
         var $viewBoard = $response.find('table.view_board');
@@ -149,22 +77,56 @@ var Post = Backbone.Model.extend({
         var next, prev;
         if($postSubject.length === 1){
             prev = null;
-            next = parsePostInfo($postSubject[0]);
+            next = self.parsePostSubject($postSubject.eq(0));
         }else{
-            prev = parsePostInfo($postSubject[0]);
-            next = parsePostInfo($postSubject[1]);
+            prev = self.parsePostSubject($postSubject.eq(0));
+            next = self.parsePostSubject($postSubject.eq(1));
         }
 
         console.log("prev", prev, "next", next);
         
         return {
             author: author,
-            info: info,
-            title: title,
-            content: content,
+            date: date,
+            hit: hit,
+            vote: vote,
+            subject: subject,
+            content: $content.html(),
+            signature: signature,
             comments: comments,
             prev: prev,
             next: next            
+        };
+    },
+    
+    parseUserInfo: function(tag){
+        var author;
+        var $img = tag.find("img");
+        if($img.length){
+            author = "http://clien.career.co.kr/cs2" + $img.data('src').replace("..","");
+        }else{
+            author = tag.find("span").text().trim();
+        }
+        return author;
+    },
+    
+    parsePostSubject: function( $subject ){
+        return {
+            id: $subject.find("a").attr('href')
+                    .match(/wr_id=(\d+)/)[1],
+            title: $subject.find("a").text().trim(),
+            commentCount: $subject.find("span").text().trim()
+                            .replace(/[\[\]]/g,'')
+        };
+    },
+    
+    parseComment: function($comment){
+        var self = this;
+        return {
+            author: self.parseUserInfo( $comment.find("ul li") ),
+            date: $comment.find("ul li").eq(1)
+                    .text().trim().replace(/[()]/g,""),
+            content: $comment.next('div').text().trim()
         };
     }
 });
@@ -173,13 +135,9 @@ var PostList = Backbone.Collection.extend({
     model: Post,
     parse: function(response){
         var posts = [];
-        //findTag(response,'iframe');
-        //findTag(response,'script');
         response = removeTag(response,'iframe');
         response = removeTag(response,'script');
-        //findTag(response,'iframe');
-        //findTag(response,'script');
-        response = removeImgSrc(response);
+        response = replaceImgSrc(response);
         
         var $response = $(response);
         
@@ -189,13 +147,13 @@ var PostList = Backbone.Collection.extend({
             if(index<2){ return; } // skip notice post
             //console.log('#'+index);
             var $post = $(this);
-            var post_id = $post.find('td').eq(0).text();
+            var post_id = $post.find('td').eq(0).text().trim();
             //console.log('post_id='+post_id);
             var $post_subject = $post.find('td.post_subject');
             var post_subject;
             if( $post_subject.find('a').length ){
                 //console.log('subject='+$post_subject.find('a').text());
-                post_subject = $post_subject.find('a').text();
+                post_subject = $post_subject.find('a').text().trim();
             }else{
                 console.warn('blocked post');
                 return;
@@ -256,13 +214,13 @@ var boards = new Boards([
 
 var $boardList = $('#home ul.boards');
 boards.each(function(board){
-    console.log('toJSON',board.toJSON());
+    //console.log('toJSON',board.toJSON());
     var $tmpl = $('#board-list-tmpl').tmpl(board);
-    console.log($tmpl);
+    //console.log($tmpl);
     $tmpl.appendTo($boardList);
     
     var $pageTmpl = $('#board-page-tmpl').tmpl(board.toJSON());
-    console.log($pageTmpl);
+    //console.log($pageTmpl);
     $pageTmpl.appendTo('body');
 });
 
@@ -306,7 +264,7 @@ $('div.board ul.posts li a').live('tap', function(event, ui){
             board: { id: boardID },
             post: { id: postID }
         });
-        console.log($pageTmpl);
+        //console.log($pageTmpl);
         $pageTmpl.appendTo('body').page();
     }
 });
@@ -332,6 +290,9 @@ $('div.post').live('pageshow', function(event, ui){
     
     post.fetch({dataType:'html'})
         .success(function(){
+            console.log( post.toJSON() );
+            $page.find('div[data-role="header"]').html(post.get('subject'));
+            $page.find('div[data-role="content"]').html(post.get('content'));
         })
         .complete(function(){
             $.mobile.hidePageLoadingMsg();
