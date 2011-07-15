@@ -5,6 +5,11 @@ if (!window.console) {
     window.console = {log: function() {}}; 
 }
 
+$('div').live('pagebeforecreate beforecreate', function(event){
+    var $page = $(this);
+    console.warn('pagebeforecreate', $page);
+});
+
 function removeTag(html, tag){    
     var re = new RegExp('<'+tag + '.+?' + '</'+tag+'>', 'gi');    
     return html.replace(re,'');
@@ -114,7 +119,7 @@ var Post = Backbone.Model.extend({
         return {
             id: $subject.find("a").attr('href')
                     .match(/wr_id=(\d+)/)[1],
-            title: $subject.find("a").text().trim(),
+            subject: $subject.find("a").text().trim(),
             commentCount: $subject.find("span").text().trim()
                             .replace(/[\[\]]/g,'')
         };
@@ -255,48 +260,71 @@ $('div.board ul.posts li a').live('tap', function(event, ui){
     console.log('before show post');
     // create empty post page if not exist
     var $anchor = $(this);
-    var postID = $anchor.data('postID');
-    var boardID = $anchor.data('boardID');
-    console.log('board', boardID, 'post', postID, $anchor.attr('href'));
-    
-    if($( $anchor.attr('href') ).length === 0){
-        var $pageTmpl = $('#post-page-tmpl').tmpl({
-            board: { id: boardID },
-            post: { id: postID }
-        });
-        //console.log($pageTmpl);
-        $pageTmpl.appendTo('body').page();
+    var href = $anchor.attr('href');
+    console.log('href',href);    
+    if( $(href).length === 0 ){
+
+        var postID = $anchor.data('postID');
+        var boardID = $anchor.data('boardID');
+        console.log('board', boardID, 'post', postID, $anchor.attr('href'));
+
+        var board = boards.get( boardID );   
+        if(!board){
+            throw "board not found";
+        }     
+
+        var post = board.posts.get( postID );
+        if(!post){
+            throw "post not found";
+        }
+
+        console.log('post url',post.url());
+
+        post.fetch({dataType:'html'})
+            .success(function(){
+                console.log( post.toJSON() );
+                var $page = $('#post-page-tmpl').tmpl({
+                    board: board,
+                    post: post
+                }).appendTo('body');
+                //console.log($pageTmpl);
+                $.mobile.changePage( $page );
+            });
+
     }
+    return false;
 });
+// 
+// $('div.post').live('pageshow', function(event, ui){
+//     console.log('post.pageshow');
+// 
+//     $.mobile.showPageLoadingMsg();
+// 
+//     var $page = $(this);
+//     var board = boards.get( $page.data('boardID') );   
+//     if(!board){
+//         throw "board not found";
+//     }     
+//     
+//     console.log(board.url(), board.posts.url);
+//     var post = board.posts.get( $page.data("postID") );
+//     if(!post){
+//         throw "post not found";
+//     }
+// 
+//     console.log('post url',post.url());
+//     
+//     post.fetch({dataType:'html'})
+//         .success(function(){
+//             console.log( post.toJSON() );
+//             $page.find('div[data-role="header"]').html(post.get('subject'));
+//             $page.find('div[data-role="content"]').html(post.get('content'));
+//         })
+//         .complete(function(){
+//             $.mobile.hidePageLoadingMsg();
+//         });    
+// });
 
-$('div.post').live('pageshow', function(event, ui){
-    console.log('post.pageshow');
 
-    $.mobile.showPageLoadingMsg();
-
-    var $page = $(this);
-    var board = boards.get( $page.data('boardID') );   
-    if(!board){
-        throw "board not found";
-    }     
-    
-    console.log(board.url(), board.posts.url);
-    var post = board.posts.get( $page.data("postID") );
-    if(!post){
-        throw "post not found";
-    }
-
-    console.log('post url',post.url());
-    
-    post.fetch({dataType:'html'})
-        .success(function(){
-            console.log( post.toJSON() );
-            $page.find('div[data-role="header"]').html(post.get('subject'));
-            $page.find('div[data-role="content"]').html(post.get('content'));
-        })
-        .complete(function(){
-            $.mobile.hidePageLoadingMsg();
-        });    
-});
 
 }(jQuery,window));
