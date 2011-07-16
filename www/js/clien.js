@@ -240,6 +240,7 @@ $('div.board').live('pageshow', function(event, ui){
     console.log(board.url(), board.posts.url);
     board.fetch()
         .success(function(){
+            //FIXME use each tmpl to faster templating
             board.posts.each(function(post){
                 console.log(board.id, post.id, post.get('subject'));
                 $('#post-list-tmpl').tmpl({
@@ -254,76 +255,66 @@ $('div.board').live('pageshow', function(event, ui){
             $.mobile.hidePageLoadingMsg();
         });
 });
-    
-// FIXME called after a.click()
+
 $('div.board ul.posts li a').live('tap', function(event, ui){
-    console.log('before show post');
-    // create empty post page if not exist
     var $anchor = $(this);
-    var href = $anchor.attr('href');
-    console.log('href',href);    
-    if( $(href).length === 0 ){
+    var postID = $anchor.data('postID');
+    var boardID = $anchor.data('boardID');
+    console.log('board', boardID, 'post', postID, $anchor.attr('href'));
 
-        var postID = $anchor.data('postID');
-        var boardID = $anchor.data('boardID');
-        console.log('board', boardID, 'post', postID, $anchor.attr('href'));
-
-        var board = boards.get( boardID );   
-        if(!board){
-            throw "board not found";
-        }     
-
-        var post = board.posts.get( postID );
-        if(!post){
-            throw "post not found";
-        }
-
-        console.log('post url',post.url());
-
-        post.fetch({dataType:'html'})
-            .success(function(){
-                console.log( post.toJSON() );
-                var $page = $('#post-page-tmpl').tmpl({
-                    board: board,
-                    post: post
-                }).appendTo('body');
-                //console.log($pageTmpl);
-                $.mobile.changePage( $page );
-            });
-
+    var board = boards.get( boardID );   
+    if(!board){
+        throw "board not found";
     }
-    return false;
+
+    var post = board.posts.get( postID );
+    if(!post){
+        throw "post not found";
+    }
+
+    $('#post').data({
+        boardID: boardID,
+        postID: postID
+    });
+    
+    console.log( '#page.data()', $('#post').data() );
 });
-// 
-// $('div.post').live('pageshow', function(event, ui){
-//     console.log('post.pageshow');
-// 
-//     $.mobile.showPageLoadingMsg();
-// 
-//     var $page = $(this);
-//     var board = boards.get( $page.data('boardID') );   
-//     if(!board){
-//         throw "board not found";
-//     }     
-//     
-//     console.log(board.url(), board.posts.url);
-//     var post = board.posts.get( $page.data("postID") );
-//     if(!post){
-//         throw "post not found";
-//     }
-// 
-//     console.log('post url',post.url());
-//     
-//     post.fetch({dataType:'html'})
-//         .success(function(){
-//             console.log( post.toJSON() );
-//             $page.find('div[data-role="header"]').html(post.get('subject'));
-//             $page.find('div[data-role="content"]').html(post.get('content'));
-//         })
-//         .complete(function(){
-//             $.mobile.hidePageLoadingMsg();
-//         });    
-// });
+    
+$('#post').live('pageshow', function(event, ui){
+    console.log('post.pageshow');
+
+    $.mobile.showPageLoadingMsg();
+
+    var $page = $(this);
+    var board = boards.get( $page.data('boardID') );   
+    if(!board){
+        throw "board not found";
+    }     
+    
+    console.log(board.url(), board.posts.url);
+    var post = board.posts.get( $page.data("postID") );
+    if(!post){
+        throw "post not found";
+    }
+
+    console.log('post url',post.url());
+    
+    post.fetch({dataType:'html'})
+        .success(function(){
+            console.log( post.toJSON() );
+            
+            var $page = $('#post')
+                .empty()
+                .append( $('#post-page-tmpl').tmpl({
+                        board: board,
+                        post: post
+                }))
+                .page();
+        })
+        .complete(function(){
+            $.mobile.hidePageLoadingMsg();
+        });    
+});
 
 
 
